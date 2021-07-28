@@ -5,8 +5,8 @@ MAINTAINER Ilia Dmitriev ilia.dmitriev@gmail.com
 RUN set -xe \
     
 # Install postgres, python3, runit, haproxy, pgbouncer
-    && apk add --no-cache musl-locales python3 postgresql \
-                    py3-pip runit \
+    && apk add --no-cache musl-locales postgresql pgbouncer \
+                     python3 py3-pip runit \
     && mkdir -p /run/postgresql \
     && chown -R postgres:postgres /run/postgresql \
     && mkdir -p /var/lib/postresql \
@@ -17,8 +17,8 @@ RUN set -xe \
             build-base python3-dev \
             linux-headers postgresql-dev \
             
-# Install patroni, psycopg2, jinja2
-    && pip install --no-cache-dir patroni psycopg2 requests \
+# Install patroni, psycopg2
+    && pip install --no-cache-dir patroni psycopg2 \
                                 patroni[etcd] \
 
 # cleanup
@@ -36,8 +36,6 @@ COPY --chown=postgres pgbouncer /etc/pgbouncer
 
 RUN chown -R postgres:postgres /etc/patroni \
     && chmod +x /etc/service/*/*
-
-USER postgres
 
 STOPSIGNAL SIGINT
 

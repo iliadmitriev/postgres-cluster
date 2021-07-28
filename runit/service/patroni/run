@@ -8,7 +8,14 @@ CONFIG=/etc/patroni/postgres0.yml
 USER=postgres
 GROUP=postgres
 
-test -n ${PATRONI_POSTGRESQL_DATA_DIR} || PATRONI_POSTGRESQL_DATA_DIR="/data/postgresql/data"
+# set default value to PATRONI_POSTGRESQL_DATA_DIR
+: "${PATRONI_POSTGRESQL_DATA_DIR:=/data/postgresql/data}"
+
+if [ -z "$PATRONI_ETCD_HOST"];
+then
+   echo "env variable PATRONI_ETCD_HOST is not set"
+   exit 1
+fi
 
 if [ -d ${PATRONI_POSTGRESQL_DATA_DIR} ];
 then
