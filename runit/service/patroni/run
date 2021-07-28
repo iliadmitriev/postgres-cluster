@@ -1,0 +1,20 @@
+#!/usr/bin/env sh
+set -eu
+
+exec 2>&1
+
+COMMAND=/usr/bin/patroni
+CONFIG=/etc/patroni/postgres0.yml
+USER=postgres
+GROUP=postgres
+
+test -n ${PATRONI_POSTGRESQL_DATA_DIR} || PATRONI_POSTGRESQL_DATA_DIR="/data/postgresql/data"
+
+if [ -d ${PATRONI_POSTGRESQL_DATA_DIR} ];
+then
+   mkdir -p $PATRONI_POSTGRESQL_DATA_DIR
+   chown -R $USER:$GROUP $PATRONI_POSTGRESQL_DATA_DIR
+   chmod 750 $PATRONI_POSTGRESQL_DATA_DIR
+fi
+
+exec /sbin/chpst -u ${USER}:${GROUP} ${COMMAND} ${CONFIG}
