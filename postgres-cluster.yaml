@@ -1,0 +1,90 @@
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    # should match with labels of deployment and pods
+    app: pg-postgres
+  name: pg-postgres-svc # .namespace.svc.cluster.local
+spec:
+  selector:
+    # should match with labels of deployment and pods
+    app: pg-postgres
+  ports:
+    - name: pg
+      port: 5432
+      targetPort: 5432
+    - name: pgbouncer
+      port: 6432
+      targetPort: 6432
+    - name: patroni
+      port: 8008
+      targetPort: 8008
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: pg-postgres # postgres-0.postgres-db.namespace.svc.cluster.local
+spec:
+  selector:
+    matchLabels:
+      app: pg-postgres
+  serviceName: pg-postgres-svc # should match .metadata.name of headless service
+  replicas: 3
+  template:
+    metadata:
+      labels:
+        app: pg-postgres
+    spec:
+      containers:
+      - name: pg-postgres-pod
+        imagePullPolicy: Always
+        image: iliadmitriev/postgres-cluster
+        readinessProbe:
+          httpGet:
+            scheme: HTTP
+            path: /readiness
+            port: 8008
+          initialDelaySeconds: 3
+          periodSeconds: 10
+          timeoutSeconds: 5
+          successThreshold: 1
+          failureThreshold: 3
+        ports:
+          - name: pg
+            containerPort: 5432
+          - name: pgbouncer
+            containerPort: 6432
+          - name: patroni
+            containerPort: 8008
+        env:
+          - name: POD_NAME
+            valueFrom:
+              fieldRef:
+                fieldPath: metadata.name
+          - name: POD_IP
+            valueFrom:
+              fieldRef:
+                fieldPath: status.podIP
+          - name: PATRONI_NAME
+            valueFrom:
+              fieldRef:
+                fieldPath: metadata.name
+          - name: PATRONI_ETCD_HOST
+            value: pg-etcd-svc:2379
+          - name: PATRONI_POSTGRESQL_CONNECT_ADDRESS
+            value: "$(POD_IP):5432"
+          - name: PATRONI_RESTAPI_CONNECT_ADDRESS
+            value: "$(POD_IP):8008"
+          - name: PATRONI_POSTGRESQL_DATA_DIR
+            value: /data/postgres/data
+        volumeMounts:
+        - name: pg-postgres-pvc
+          mountPath: /data
+  volumeClaimTemplates:
+  - metadata:
+      name: pg-postgres-pvc
+    spec:
+      accessModes: [ "ReadWriteOnce" ]
+      resources:
+        requests:
+          storage: 10Gi
