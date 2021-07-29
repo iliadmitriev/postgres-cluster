@@ -88,3 +88,25 @@ spec:
       resources:
         requests:
           storage: 10Gi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: pg-postgres
+    role: master
+  name: pg-postgres-master
+spec:
+  selector:
+    app: pg-postgres
+    role: master
+  ports:
+    - name: pg
+      port: 5432
+      targetPort: 5432
+    - name: pgbouncer
+      port: 6432
+      targetPort: 6432
+    - name: patroni
+      port: 8008
+      targetPort: 8008
