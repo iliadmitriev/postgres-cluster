@@ -49,6 +49,16 @@ spec:
           timeoutSeconds: 5
           successThreshold: 1
           failureThreshold: 3
+        livenessProbe:
+          httpGet:
+            scheme: HTTP
+            path: /liveness
+            port: 8008
+          initialDelaySeconds: 3
+          periodSeconds: 10
+          timeoutSeconds: 5
+          successThreshold: 1
+          failureThreshold: 3
         ports:
           - name: pg
             containerPort: 5432
@@ -110,3 +120,4 @@ spec:
     - name: patroni
       port: 8008
       targetPort: 8008
+
