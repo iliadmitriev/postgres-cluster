@@ -131,7 +131,7 @@ postgresql:
     max_connections: 120
   # Additional fencing script executed after acquiring the leader lock but before promoting the replica
   #pre_promote: /path/to/pre_promote.sh
-  on_role_change: sh -c "/etc/patroni/on_role_change.sh"
+  on_role_change: /etc/patroni/on_role_change.sh
 
 #watchdog:
 #  mode: automatic # Allowed values: off, automatic, required
