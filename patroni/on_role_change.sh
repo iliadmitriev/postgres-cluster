@@ -1,22 +1,37 @@
 #!/usr/bin/env sh
 
-echo "ARGUMENTS"
-echo $@
+NEW_ROLE=$1
+
+test -z $NEW_ROLE && { echo "NEW_ROLE is empty" ; exit 1; }
 
 NAMESPACE=$(cat /var/run/secrets/kubernetes.io/serviceaccount/namespace)
 CA_BUNDLE=/var/run/secrets/kubernetes.io/serviceaccount/ca.crt
 TOKEN=$(cat /var/run/secrets/kubernetes.io/serviceaccount/token)
 API_URL=https://kubernetes.default.svc.cluster.local/api/v1
 
-# get all masters
-# get code -s -o -I -L -w "%{http_code}"
-ROLE_LABEL_MASTER=$(curl -s --cacert ${CA_BUNDLE} \
-   -H "Authorization: Bearer ${TOKEN}" \
-   ${API_URL}/namespaces/${NAMESPACE}/pods\?labelSelector=role\=master,app\=pg-postgres)
+case $NEW_ROLE in
+"master")
+  # add label
+  RES=$(curl -s -o -I -L -w "%{http_code}" --cacert $CA_BUNDLE \
+     -H "Authorization: Bearer $TOKEN" \
+     $API_URL/namespaces/$NAMESPACE/pods/$(hostname) \
+     -XPATCH -H 'Content-type: application/merge-patch+json' \
+     -d '{"metadata":{"labels":{"role":"master"}}}')
 
-echo "ROLE_LABEL_MASTER = ${ROLE_LABEL_MASTER}"
+  ;;
+"replica")
+  # delete label
+  RES=$(curl -s -o -I -L -w "%{http_code}" --cacert $CA_BUNDLE \
+     -H "Authorization: Bearer $TOKEN" \
+     $API_URL/namespaces/$NAMESPACE/pods/$(hostname) \
+     -XPATCH -H 'Content-type: application/merge-patch+json' \
+     -d '{"metadata":{"labels":{"role":null}}}')
+  ;;
+esac
 
-echo $(date -Iseconds) >> /etc/patroni/patroni.sw.log
-echo "echo $@" >> /etc/patroni/patroni.sw.log
-echo "${ROLE_LABEL_MASTER}" >> /etc/patroni/patroni.sw.log
-echo "" >> /etc/patroni/patroni.sw.log
+if [ $RES -eq 200 ];
+then
+  echo "$(date -Iseconds): Changed label role for pod to=$NEW_ROLE"
+else
+  echo "$(date -Iseconds): Failed to change label role for pod to=$NEW_ROLE"
+fi
