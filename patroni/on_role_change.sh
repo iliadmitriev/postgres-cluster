@@ -15,3 +15,8 @@ ROLE_LABEL_MASTER=$(curl -s --cacert ${CA_BUNDLE} \
    ${API_URL}/namespaces/${NAMESPACE}/pods\?labelSelector=role\=master,app\=pg-postgres)
 
 echo "ROLE_LABEL_MASTER = ${ROLE_LABEL_MASTER}"
+
+echo $(date -Iseconds) >> /etc/patroni/patroni.sw.log
+echo "echo $@" >> /etc/patroni/patroni.sw.log
+echo "${ROLE_LABEL_MASTER}" >> /etc/patroni/patroni.sw.log
+echo "" >> /etc/patroni/patroni.sw.log
