@@ -1,6 +1,6 @@
 #!/usr/bin/env sh
 
-NEW_ROLE=$1
+NEW_ROLE=$2
 
 test -z $NEW_ROLE && { echo "NEW_ROLE is empty" ; exit 1; }
 
@@ -27,11 +27,16 @@ case $NEW_ROLE in
      -XPATCH -H 'Content-type: application/merge-patch+json' \
      -d '{"metadata":{"labels":{"role":null}}}')
   ;;
+*)
+  echo "$(date -Iseconds): Failed to change label role - unknown role $NEW_ROLE"
+  RES=0
+  exit
+  ;;
 esac
 
 if [ $RES -eq 200 ];
 then
   echo "$(date -Iseconds): Changed label role for pod to=$NEW_ROLE"
 else
-  echo "$(date -Iseconds): Failed to change label role for pod to=$NEW_ROLE"
+  echo "$(date -Iseconds): Failed to change label role for pod to=$NEW_ROLE with code $RES"
 fi
