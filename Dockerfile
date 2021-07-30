@@ -6,7 +6,7 @@ RUN set -xe \
     
 # Install postgres, python3, runit, haproxy, pgbouncer
     && apk add --no-cache musl-locales postgresql pgbouncer \
-                     python3 py3-pip runit \
+                     python3 py3-pip runit curl \
     && mkdir -p /run/postgresql \
     && chown -R postgres:postgres /run/postgresql \
     && mkdir -p /var/lib/postresql \
