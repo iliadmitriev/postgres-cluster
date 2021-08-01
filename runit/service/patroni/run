@@ -7,21 +7,32 @@ COMMAND=/usr/bin/patroni
 CONFIG=/etc/patroni/postgres0.yml
 USER=postgres
 GROUP=postgres
+SUDO=/bin/su
 
-# set default value to PATRONI_POSTGRESQL_DATA_DIR
+# set default value to PATRONI_POSTGRESQL_DATA_DIR if not set
 : "${PATRONI_POSTGRESQL_DATA_DIR:=/data/postgresql/data}"
 
+# check if URI to etcd server is not set
+# and exit (patroni will not work without etcd)
 if [ -z "$PATRONI_ETCD_HOST"];
 then
    echo "env variable PATRONI_ETCD_HOST is not set"
    exit 1
 fi
 
-if [ -d ${PATRONI_POSTGRESQL_DATA_DIR} ];
+# check if data directory does't exists
+# and create it
+if [ ! -d ${PATRONI_POSTGRESQL_DATA_DIR} ];
 then
-   mkdir -p $PATRONI_POSTGRESQL_DATA_DIR
-   chown -R $USER:$GROUP $PATRONI_POSTGRESQL_DATA_DIR
-   chmod 750 $PATRONI_POSTGRESQL_DATA_DIR
+   mkdir -p -m 750 $PATRONI_POSTGRESQL_DATA_DIR
+fi
+
+# check if data directory is not user writable
+# then change permission
+if ! $SUDO $USER -c "test -w ${PATRONI_POSTGRESQL_DATA_DIR}";
+then
+  chmod 750 $PATRONI_POSTGRESQL_DATA_DIR
+  chown -R $USER:$GROUP $PATRONI_POSTGRESQL_DATA_DIR
 fi
 
 exec /sbin/chpst -u ${USER}:${GROUP} ${COMMAND} ${CONFIG}
