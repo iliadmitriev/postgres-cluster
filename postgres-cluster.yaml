@@ -96,6 +96,8 @@ spec:
   volumeClaimTemplates:
   - metadata:
       name: pg-postgres-pvc
+      labels:
+        app: pg-postgres
     spec:
       accessModes: [ "ReadWriteOnce" ]
       resources:
