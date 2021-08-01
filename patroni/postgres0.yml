@@ -65,7 +65,7 @@ bootstrap:
 #        hot_standby: "on"
         max_connections: 120
 #        max_worker_processes: 8
-#        wal_keep_segments: 8
+        wal_keep_segments: 16
 #        max_wal_senders: 10
 #        max_replication_slots: 10
 #        max_prepared_transactions: 0
