@@ -36,6 +36,16 @@ spec:
         app: pg-postgres
     spec:
       serviceAccountName: pg-service-account
+#      affinity:
+#        podAntiAffinity:
+#          requiredDuringSchedulingIgnoredDuringExecution:
+#            - topologyKey: "kubernetes.io/hostname"
+#              labelSelector:
+#                matchExpressions:
+#                  - key: app
+#                    operator: In
+#                    values:
+#                      - pg-postgres
       containers:
       - name: pg-postgres-pod
         imagePullPolicy: Always
