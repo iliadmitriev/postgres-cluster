@@ -34,7 +34,7 @@ COPY --chown=postgres:postgres patroni /etc/patroni
 
 USER postgres
 
-STOPSIGNAL SIGINT
+STOPSIGNAL SIGTERM
 
 EXPOSE 5432 8008
 
