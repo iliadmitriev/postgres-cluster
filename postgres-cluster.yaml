@@ -121,13 +121,11 @@ spec:
           - name: patroni
             containerPort: 8008
         env:
-          - name: PATRONI_taskcamp_PASSWORD
-            value: 'secret'
-          - name: PATRONI_taskcamp_OPTIONS
-            value: 'createdb'
-          - name: CREATE_DB_IF_NOT_EXISTS
+          - name: POSTGRES_USER
             value: "taskcamp"
-          - name: CREATE_DB_OWNER
+          - name: POSTGRES_PASSWORD
+            value: "secret"
+          - name: POSTGRES_DB
             value: "taskcamp"
           - name: PATRONI_KUBERNETES_LABELS
             value: "{app: pg-postgres, cluster-name: main}"
