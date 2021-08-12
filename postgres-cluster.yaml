@@ -86,7 +86,7 @@ spec:
             runAsGroup: 0
             runAsUser: 0
           volumeMounts:
-          - name: pg-postgres-pvc
+          - name: postgres-pvc
             mountPath: /data
       containers:
       - name: pg-postgres-pod
@@ -156,11 +156,11 @@ spec:
           - name: PATRONI_POSTGRESQL_DATA_DIR
             value: /data/postgres/data
         volumeMounts:
-        - name: pg-postgres-pvc
+        - name: postgres-pvc
           mountPath: /data
   volumeClaimTemplates:
   - metadata:
-      name: pg-postgres-pvc
+      name: postgres-pvc
       labels:
         app: pg-postgres
     spec:
