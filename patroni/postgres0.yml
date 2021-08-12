@@ -97,13 +97,15 @@ bootstrap:
   # Additional script to be launched after initial cluster creation (will be passed the connection URL as parameter)
 # post_init: /usr/local/bin/setup_cluster.sh
 
-  # Some additional users users which needs to be created after initializing new cluster
-  users:
-    admin:
-      password: admin
-      options:
-        - createrole
-        - createdb
+# Some additional users users which needs to be created after initializing new cluster
+#PATRONI_<username>_PASSWORD=’<password>’
+#PATRONI_<username>_OPTIONS=’list,of,options’
+#  users:
+#    admin:
+#      password: admin
+#      options:
+#        - createrole
+#        - createdb
 
 postgresql:
   listen: 0.0.0.0:5432

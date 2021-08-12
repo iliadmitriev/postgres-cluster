@@ -97,6 +97,10 @@ spec:
           - name: patroni
             containerPort: 8008
         env:
+          - name: PATRONI_taskcamp_PASSWORD
+            value: 'secret'
+          - name: PATRONI_taskcamp_OPTIONS
+            value: 'createdb'
           - name: PATRONI_KUBERNETES_LABELS
             value: "{app: pg-postgres, cluster-name: main}"
           - name: PATRONI_SCOPE
