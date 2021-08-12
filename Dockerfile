@@ -28,11 +28,10 @@ RUN set -xe \
     && rm -rf /var/cache/apk/*
     
 ENV LANG=ru_RU.UTF-8 \
-    PGDATA=/var/lib/postgresql/data
+    PGDATA=/var/lib/postgresql/data \
+    PATRONI_CONFIGURATION=/etc/patroni/postgres0.yml
 
-COPY --chown=postgres patroni /etc/patroni
-
-RUN chown -R postgres:postgres /etc/patroni
+COPY --chown=postgres:postgres patroni /etc/patroni
 
 USER postgres
 

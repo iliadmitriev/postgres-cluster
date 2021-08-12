@@ -4,11 +4,13 @@ metadata:
   labels:
     # should match with labels of deployment and pods
     app: pg-postgres
+    cluster-name: main
   name: pg-postgres # .namespace.svc.cluster.local
 spec:
   selector:
     # should match with labels of deployment and pods
     app: pg-postgres
+    cluster-name: main
   ports:
     - name: pg
       port: 5432
@@ -28,31 +30,49 @@ spec:
   selector:
     matchLabels:
       app: pg-postgres
+      cluster-name: main
   serviceName: pg-postgres # should match .metadata.name of headless service
   replicas: 3
   template:
     metadata:
       labels:
         app: pg-postgres
+        cluster-name: main
     spec:
       securityContext:
         runAsUser: 70
         fsGroup: 70
+        runAsGroup: 70
+        fsGroupChangePolicy: Always
       serviceAccountName: pg-service-account
-#      affinity:
-#        podAntiAffinity:
-#          requiredDuringSchedulingIgnoredDuringExecution:
-#            - topologyKey: "kubernetes.io/hostname"
-#              labelSelector:
-#                matchExpressions:
-#                  - key: app
-#                    operator: In
-#                    values:
-#                      - pg-postgres
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 5
+              podAffinityTerm:
+                topologyKey: "kubernetes.io/hostname"
+                labelSelector:
+                  matchLabels:
+                    app: pg-postgres
+      initContainers:
+        - name: volume-mount-hack
+          image: busybox
+          command: ['sh', '-c', "chown -R 70:70 /data"]
+          securityContext:
+            runAsGroup: 0
+            runAsUser: 0
+          volumeMounts:
+          - name: pg-postgres-pvc
+            mountPath: /data
       containers:
       - name: pg-postgres-pod
         imagePullPolicy: Always
         image: iliadmitriev/postgres-cluster
+#        command: [ "/bin/sh", "-c", "--" ]
+#        args: [ "while true; do sleep 5; done;" ]
+        securityContext:
+          runAsUser: 70
+          runAsGroup: 70
         readinessProbe:
           httpGet:
             scheme: HTTP
@@ -76,8 +96,6 @@ spec:
         ports:
           - name: pg
             containerPort: 5432
-          - name: pgbouncer
-            containerPort: 6432
           - name: patroni
             containerPort: 8008
         env:
@@ -120,11 +138,13 @@ kind: Service
 metadata:
   labels:
     app: pg-postgres
+    cluster-name: main
     role: master
   name: pg-postgres-master
 spec:
   selector:
     app: pg-postgres
+    cluster-name: main
     role: master
   ports:
     - name: pg
