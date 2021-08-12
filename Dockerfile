@@ -4,7 +4,7 @@ MAINTAINER Ilia Dmitriev ilia.dmitriev@gmail.com
 
 RUN set -xe \
     
-# Install postgres, python3, runit, haproxy, pgbouncer
+# Install postgres, python3, runit, pgbouncer
     && apk add --no-cache musl-locales postgresql pgbouncer \
                      python3 py3-pip runit curl \
     && mkdir -p /run/postgresql \
@@ -19,7 +19,7 @@ RUN set -xe \
             
 # Install patroni, psycopg2
     && pip install --no-cache-dir patroni psycopg2 \
-                                patroni[etcd] \
+                                patroni[kubernetes] \
 
 # cleanup
     && rm -rf /tmp/* \

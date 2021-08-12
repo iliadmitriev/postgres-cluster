@@ -18,10 +18,10 @@ restapi:
 #   certfile: /etc/ssl/certs/ssl-cert-snakeoil.pem
 #   cacert: /etc/ssl/certs/ssl-cacert-snakeoil.pem
 
-etcd:
+#etcd:
   #Provide host to do the initial discovery of the cluster topology:
   # this is set via PATRONI_ETCD_HOST variable
-  host: 127.0.0.1:2379
+#  host: 127.0.0.1:2379
   #Or use "hosts" to provide multiple endpoints
   #Could be a comma separated string:
   #hosts: host1:port1,host2:port2
@@ -32,6 +32,10 @@ etcd:
   #Once discovery is complete Patroni will use the list of advertised clientURLs
   #It is possible to change this behavior through by setting:
   #use_proxies: true
+
+kubernetes:
+  labels:
+    app: pg-postgres
 
 #raft:
 #  data_dir: .
@@ -59,7 +63,7 @@ bootstrap:
       #primary_slot_name: patroni
     postgresql:
       use_pg_rewind: true
-      use_slots: true
+      use_slots: false
       parameters:
 #        wal_level: hot_standby
 #        hot_standby: "on"
@@ -123,19 +127,22 @@ postgresql:
       password: rewind_secret
   # Server side kerberos spn
 #  krbsrvname: postgres
+  use_unix_socket: false
+  use_pg_rewind: true
   parameters:
     # Fully qualified kerberos ticket file for the running user
     # same as KRB5CCNAME used by the GSS
 #   krb_server_keyfile: /var/spool/keytabs/postgres
-    unix_socket_directories: '.'
+    #unix_socket_directories: '.'
     max_connections: 120
   # Additional fencing script executed after acquiring the leader lock but before promoting the replica
   #pre_promote: /path/to/pre_promote.sh
-  callbacks:
-    on_role_change: /etc/patroni/on_role_change.sh
+#  callbacks:
+#    on_start: /etc/patroni/on_role_change.sh
+#    on_role_change: /etc/patroni/on_role_change.sh
 
-#watchdog:
-#  mode: automatic # Allowed values: off, automatic, required
+watchdog:
+  mode: off # Allowed values: off, automatic, required
 #  device: /dev/watchdog
 #  safety_margin: 5
 

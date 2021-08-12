@@ -4,7 +4,7 @@ metadata:
   labels:
     # should match with labels of deployment and pods
     app: pg-postgres
-  name: pg-postgres-svc # .namespace.svc.cluster.local
+  name: pg-postgres # .namespace.svc.cluster.local
 spec:
   selector:
     # should match with labels of deployment and pods
@@ -28,7 +28,7 @@ spec:
   selector:
     matchLabels:
       app: pg-postgres
-  serviceName: pg-postgres-svc # should match .metadata.name of headless service
+  serviceName: pg-postgres # should match .metadata.name of headless service
   replicas: 3
   template:
     metadata:
@@ -90,8 +90,6 @@ spec:
             valueFrom:
               fieldRef:
                 fieldPath: metadata.name
-          - name: PATRONI_ETCD_HOST
-            value: pg-etcd-svc:2379
           - name: PATRONI_SCOPE
             value: main
           - name: PATRONI_POSTGRESQL_CONNECT_ADDRESS
