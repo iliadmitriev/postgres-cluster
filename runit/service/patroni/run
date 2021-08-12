@@ -14,11 +14,11 @@ SUDO=/bin/su
 
 # check if URI to etcd server is not set
 # and exit (patroni will not work without etcd)
-if [ -z "$PATRONI_ETCD_HOST"];
-then
-   echo "env variable PATRONI_ETCD_HOST is not set"
-   exit 1
-fi
+#if [ -z "$PATRONI_ETCD_HOST"];
+#then
+#   echo "env variable PATRONI_ETCD_HOST is not set"
+#   exit 1
+#fi
 
 # check if data directory does't exists
 # and create it
