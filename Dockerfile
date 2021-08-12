@@ -5,8 +5,8 @@ MAINTAINER Ilia Dmitriev ilia.dmitriev@gmail.com
 RUN set -xe \
     
 # Install postgres, python3, runit, pgbouncer
-    && apk add --no-cache musl-locales postgresql pgbouncer \
-                     python3 py3-pip runit curl \
+    && apk add --no-cache musl-locales postgresql \
+                     python3 py3-pip \
     && mkdir -p /run/postgresql \
     && chown -R postgres:postgres /run/postgresql \
     && mkdir -p /var/lib/postresql \
@@ -30,15 +30,14 @@ RUN set -xe \
 ENV LANG=ru_RU.UTF-8 \
     PGDATA=/var/lib/postgresql/data
 
-COPY runit /etc
 COPY --chown=postgres patroni /etc/patroni
-COPY --chown=postgres pgbouncer /etc/pgbouncer
 
-RUN chown -R postgres:postgres /etc/patroni \
-    && chmod +x /etc/service/*/*
+RUN chown -R postgres:postgres /etc/patroni
+
+USER postgres
 
 STOPSIGNAL SIGINT
 
-EXPOSE 6432 5432 8008
+EXPOSE 5432 8008
 
-CMD ["/sbin/runsvdir", "-P", "/etc/service"]
+CMD ["/usr/bin/patroni", "/etc/patroni/postgres0.yml"]
