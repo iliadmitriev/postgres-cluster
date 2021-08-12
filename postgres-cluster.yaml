@@ -5,7 +5,7 @@ metadata:
     # should match with labels of deployment and pods
     app: pg-postgres
     cluster-name: main
-  name: pg-postgres # .namespace.svc.cluster.local
+  name: postgres-taskcamp # .namespace.svc.cluster.local
 spec:
   selector:
     # should match with labels of deployment and pods
@@ -25,7 +25,7 @@ spec:
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
-  name: pg-postgres # postgres-0.postgres-db.namespace.svc.cluster.local
+  name: postgres-taskcamp # postgres-0.postgres-db.namespace.svc.cluster.local
 spec:
   selector:
     matchLabels:
@@ -99,6 +99,12 @@ spec:
           - name: patroni
             containerPort: 8008
         env:
+          - name: PATRONI_KUBERNETES_NAMESPACE
+            valueFrom:
+              fieldRef:
+                fieldPath: metadata.namespace
+          - name: PATRONI_KUBERNETES_LABELS
+            value: "{app: pg-postgres}"
           - name: POD_NAME
             valueFrom:
               fieldRef:
@@ -108,11 +114,9 @@ spec:
               fieldRef:
                 fieldPath: status.podIP
           - name: PATRONI_NAME
-            valueFrom:
-              fieldRef:
-                fieldPath: metadata.name
-          - name: PATRONI_SCOPE
             value: main
+          - name: PATRONI_SCOPE
+            value: metadata.labels.cluster-name
           - name: PATRONI_POSTGRESQL_CONNECT_ADDRESS
             value: "$(POD_IP):5432"
           - name: PATRONI_RESTAPI_CONNECT_ADDRESS
@@ -140,7 +144,7 @@ metadata:
     app: pg-postgres
     cluster-name: main
     role: master
-  name: pg-postgres-master
+  name: postgres-taskcamp-master
 spec:
   selector:
     app: pg-postgres

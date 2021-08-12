@@ -33,9 +33,7 @@ restapi:
   #It is possible to change this behavior through by setting:
   #use_proxies: true
 
-kubernetes:
-  labels:
-    app: pg-postgres
+kubernetes: {}
 
 #raft:
 #  data_dir: .
