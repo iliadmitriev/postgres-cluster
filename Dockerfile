@@ -4,7 +4,7 @@ MAINTAINER Ilia Dmitriev ilia.dmitriev@gmail.com
 
 RUN set -xe \
     
-# Install postgres, python3, runit, pgbouncer
+# Install postgres, python3
     && apk add --no-cache musl-locales postgresql \
                      python3 py3-pip \
     && mkdir -p /run/postgresql \
@@ -28,8 +28,7 @@ RUN set -xe \
     && rm -rf /var/cache/apk/*
     
 ENV LANG=ru_RU.UTF-8 \
-    PGDATA=/var/lib/postgresql/data \
-    PATRONI_CONFIGURATION=/etc/patroni/postgres0.yml
+    PGDATA=/var/lib/postgresql/data
 
 COPY --chown=postgres:postgres patroni /etc/patroni
 
